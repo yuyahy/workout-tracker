@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: workout-postgres
+    environment:
+      POSTGRES_USER: workout
+      POSTGRES_PASSWORD: workout123
+      POSTGRES_DB: workout_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  dynamodb-local:
+    image: amazon/dynamodb-local:latest
+    container_name: workout-dynamodb
+    ports:
+      - "8000:8000"
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+    volumes:
+      - dynamodb_data:/home/dynamodblocal/data
+
+volumes:
+  postgres_data:
+  dynamodb_data:

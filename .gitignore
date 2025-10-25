@@ -1,0 +1,10 @@
+# Docker volumes
+postgres_data/
+dynamodb_data/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
