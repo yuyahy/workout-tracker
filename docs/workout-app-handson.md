@@ -881,7 +881,7 @@ export async function createWorkout(formData: FormData) {
 
   if (!validatedFields.success) {
     return {
-      error: validatedFields.error.errors[0].message,
+      error: validatedFields.error.issues[0].message,
     }
   }
 
@@ -930,7 +930,7 @@ export async function updateWorkout(id: string, formData: FormData) {
 
   if (!validatedFields.success) {
     return {
-      error: validatedFields.error.errors[0].message,
+      error: validatedFields.error.issues[0].message,
     }
   }
 
