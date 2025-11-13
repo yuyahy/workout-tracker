@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "hono": "^4.10.5"
+  },
+  "devDependencies": {
+    "@hono/node-server": "^1.19.6"
+  }
+}
