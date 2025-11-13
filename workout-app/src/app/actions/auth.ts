@@ -4,6 +4,7 @@
 // 専用のAPIエンドポイントを作らなくても、クライアントからサーバ上の処理を直接呼び出せる
 
 import { prisma } from "@/lib/prisma"
+import { signIn } from "@/lib/auth"
 import bcrypt from "bcryptjs"
 import { z } from "zod"
 
@@ -41,9 +42,10 @@ export async function signUp(formData: FormData) {
 
     // パスワードをハッシュ化
     const hashedPassword = await bcrypt.hash(password, 10)
+    console.log("Signup - Hashed password:", hashedPassword)
 
     // ユーザー作成
-    await prisma.user.create({
+    const createdUser = await prisma.user.create({
         data: {
             email,
             password: hashedPassword,
@@ -51,7 +53,20 @@ export async function signUp(formData: FormData) {
         },
     })
 
+    console.log("User created:", { id: createdUser.id, email: createdUser.email })
+
     return {
         success: true,
     }
+}
+
+export async function signInAction(formData: FormData) {
+    const email = formData.get("email") as string
+    const password = formData.get("password") as string
+
+    await signIn("credentials", {
+        email,
+        password,
+        redirectTo: "/dashboard",
+    })
 }

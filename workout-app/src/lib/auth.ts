@@ -21,10 +21,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 const validatedFields = signInSchema.safeParse(credentials)
 
                 if (!validatedFields.success) {
+                    console.log("Validation failed:", validatedFields.error)
                     return null
                 }
 
                 const { email, password } = validatedFields.data
+                console.log("Looking for user with email:", email)
 
                 // ユーザー検索
                 const user = await prisma.user.findUnique({
@@ -32,16 +34,21 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 })
 
                 if (!user) {
+                    console.log("User not found")
                     return null
                 }
+
+                console.log("User found:", { id: user.id, email: user.email })
 
                 // パスワード検証
                 const passwordMatch = await bcrypt.compare(password, user.password)
 
                 if (!passwordMatch) {
+                    console.log("Password does not match")
                     return null
                 }
 
+                console.log("Authentication successful")
                 return {
                     id: user.id,
                     email: user.email,
@@ -52,6 +59,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     ],
     pages: {
         signIn: "/login",
+        error: "/login/error",
     },
     callbacks: {
         // ログイン時 & リクエスト毎に実行
