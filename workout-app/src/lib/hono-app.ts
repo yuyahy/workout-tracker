@@ -56,6 +56,11 @@ app.get("/api/stats", async (c) => {
 
         return acc
     }, {} as Record<string, any>)
+
+    return c.json({
+        totalWorkouts: workouts.length,
+        statsByExercise: Object.values(statsByExercise),
+    })
 })
 
 // 月別の統計
