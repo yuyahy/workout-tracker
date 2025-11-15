@@ -1,7 +1,6 @@
-import { auth, signOut } from "@/lib/auth"
-import Link from "next/link"
+import { auth, signOut } from '@/lib/auth'
+import Link from 'next/link'
 
-// Server Componentとしてナビゲーションバーを実装
 export async function Navbar() {
     const session = await auth()
 
@@ -21,6 +20,9 @@ export async function Navbar() {
                     </Link>
                     <Link href="/workouts/new" className="text-gray-600 hover:text-gray-900">
                         新規記録
+                    </Link>
+                    <Link href="/stats" className="text-gray-600 hover:text-gray-900">
+                        統計情報
                     </Link>
                 </div>
 
