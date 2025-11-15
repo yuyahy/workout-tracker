@@ -6,7 +6,7 @@ import { EditForm } from './edit-form'
 export default async function EditWorkoutPage({
     params,
 }: {
-    params: { id: string }
+    params: Promise<{ id: string }>
 }) {
     const session = await auth()
 
@@ -14,8 +14,10 @@ export default async function EditWorkoutPage({
         redirect("/login")
     }
 
+    const { id } = await params
+
     const workout = await prisma.workout.findUnique({
-        where: { id: params.id },
+        where: { id },
     })
 
     if (!workout) {

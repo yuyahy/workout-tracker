@@ -7,7 +7,7 @@ import { DeleteButton } from './delete-button'
 export default async function WorkoutDetailPage({
     params,
 }: {
-    params: { id: string }
+    params: Promise<{ id: string }>
 }) {
     const session = await auth()
 
@@ -15,8 +15,10 @@ export default async function WorkoutDetailPage({
         redirect("/login")
     }
 
+    const { id } = await params
+
     const workout = await prisma.workout.findUnique({
-        where: { id: params.id },
+        where: { id },
     })
 
     if (!workout) {
