@@ -18,9 +18,9 @@ services:
     container_name: workout-dynamodb
     ports:
       - "8000:8000"
-    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+    command: "-jar DynamoDBLocal.jar -sharedDb"
     volumes:
-      - dynamodb_data:/home/dynamodblocal/data
+      - dynamodb_data:/home/dynamodblocal
 
 volumes:
   postgres_data:

@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "setup-dynamodb": "tsx scripts/setup-dynamodb.ts"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.932.0",
@@ -31,6 +32,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.0.0",
     "tailwindcss": "^4",
+    "tsx": "^4.20.6",
     "typescript": "^5"
   }
 }
