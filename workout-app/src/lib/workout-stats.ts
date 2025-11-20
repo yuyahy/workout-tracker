@@ -37,23 +37,12 @@ export async function updateWorkoutStats(userId: string, exerciseName: string, w
             new UpdateCommand({
                 TableName: "WorkoutStats",
                 Key: { userId, exerciseName },
-                UpdateExpression: `
-                SET totatlWorkouts=totalWorkouts + "one,
-                totalSets=totalSets+:sets,
-                totalReps=totalReps+:reps,
-                totalVolume=totalVolume+:volume,
-                maxWeight=if_not_exists(maxWeight, :zero),
-                maxWeight=if_not_exists(maxWeight, :weight),
-                lastWorkoutDate=:date,
-                lastUpdated=:now
-            `,
+                UpdateExpression: "SET totalWorkouts = totalWorkouts + :one, totalSets = totalSets + :sets, totalReps = totalReps + :reps, totalVolume = totalVolume + :volume, lastWorkoutDate = :date, lastUpdated = :now",
                 ExpressionAttributeValues: {
                     ":one": 1,
                     ":sets": workout.sets,
-                    "reps": workout.reps,
+                    ":reps": workout.reps,
                     ":volume": volume,
-                    ":weight": workout.weight || 0,
-                    ":zero": 0,
                     ":date": workout.date.toISOString(),
                     ":now": now,
                 }
@@ -66,7 +55,7 @@ export async function updateWorkoutStats(userId: string, exerciseName: string, w
                 new UpdateCommand({
                     TableName: "WorkoutStats",
                     Key: { userId, exerciseName },
-                    UpdateExpression: "SET maxWeight=:weight",
+                    UpdateExpression: "SET maxWeight = :weight",
                     ExpressionAttributeValues: {
                         ":weight": workout.weight,
                     }
