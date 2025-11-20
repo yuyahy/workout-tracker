@@ -105,7 +105,7 @@ export async function decrementWorkoutStats(userId: string, exerciseName: string
                 SET totalWorkouts = totalWorkouts - :one,
                 totalSets = totalSets - :sets,
                 totalReps = totalReps - :reps,
-                totalVolumen = totalVolume - :volume,
+                totalVolume = totalVolume - :volume,
                 lastUpdated = :now
             `,
             ExpressionAttributeValues: {
