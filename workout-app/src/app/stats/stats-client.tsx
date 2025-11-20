@@ -36,7 +36,7 @@ export function StatsClient() {
     }, [])
 
     if (loading) {
-        return <div>読子中...</div>
+        return <div>読み込み中...</div>
     }
 
     if (!stats) {
