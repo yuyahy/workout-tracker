@@ -24,6 +24,9 @@ export async function Navbar() {
                     <Link href="/stats" className="text-gray-600 hover:text-gray-900">
                         統計情報
                     </Link>
+                    <Link href="/stats/dynamodb" className="text-gray-600 hover:text-gray-900">
+                        DynamoDB統計
+                    </Link>
                 </div>
 
                 <div className="flex items-center gap-4">
