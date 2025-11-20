@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { z } from "zod"
+import { updateWorkoutStats, decrementWorkoutStats } from "@/lib/workout-stats"
 
 const workoutSchema = z.object({
     date: z.string(),
@@ -39,6 +40,7 @@ export async function createWorkout(formData: FormData) {
 
     const { date, exerciseName, sets, reps, weight, notes } = validateFields.data
 
+    // PostgreSQLに保存
     await prisma.workout.create({
         data: {
             userId: session.user.id,
@@ -51,6 +53,19 @@ export async function createWorkout(formData: FormData) {
         },
     })
 
+    // DynamoDBの統計を更新
+    try {
+        await updateWorkoutStats(session.user.id, exerciseName, {
+            sets,
+            reps,
+            weight: weight || null,
+            date: new Date(date),
+        })
+    } catch (error) {
+        console.error("DynamoDB統計更新エラー:", error)
+        // エラーがあってもワークアウトは保存済みなので続行
+    }
+
     revalidatePath("/workouts")
     redirect("/workouts")
 }
@@ -62,7 +77,7 @@ export async function updateWorkout(id: string, formData: FormData) {
         throw new Error("認証されていません")
     }
 
-    // 所有権チェック
+    // 所有権チェック & データ取得
     const workout = await prisma.workout.findUnique({
         where: { id },
     })
@@ -88,6 +103,28 @@ export async function updateWorkout(id: string, formData: FormData) {
 
     const { date, exerciseName, sets, reps, weight, notes } = validatedFields.data
 
+    // DynamoDB統計の更新処理
+    try {
+        // 1. 旧データの統計を減算
+        await decrementWorkoutStats(session.user.id, workout.exerciseName, {
+            sets: workout.sets,
+            reps: workout.reps,
+            weight: workout.weight,
+        })
+
+        // 2. 新データの統計を加算
+        await updateWorkoutStats(session.user.id, exerciseName, {
+            sets,
+            reps,
+            weight: weight || null,
+            date: new Date(date),
+        })
+    } catch (error) {
+        console.error("DynamoDB統計更新エラー:", error)
+        // エラーがあっても続行
+    }
+
+    // PostgreSQLを更新
     await prisma.workout.update({
         where: { id },
         data: {
@@ -99,6 +136,7 @@ export async function updateWorkout(id: string, formData: FormData) {
             notes: notes || null,
         },
     })
+
     revalidatePath("/workouts")
     revalidatePath(`/workouts/${id}`)
     redirect("/workouts")
@@ -111,7 +149,7 @@ export async function deleteWorkout(id: string) {
         throw new Error("認証されていません")
     }
 
-    // 所有権チェック
+    // 所有権チェック & データ取得
     const workout = await prisma.workout.findUnique({
         where: { id },
     })
@@ -120,9 +158,21 @@ export async function deleteWorkout(id: string) {
         throw new Error("権限がありません")
     }
 
+    // PostgreSQLから削除
     await prisma.workout.delete({
         where: { id },
     })
+
+    // DynamoDB統計を減算
+    try {
+        await decrementWorkoutStats(session.user.id, workout.exerciseName, {
+            sets: workout.sets,
+            reps: workout.reps,
+            weight: workout.weight,
+        })
+    } catch (error) {
+        console.error("DynamoDB統計更新エラー:", error)
+    }
 
     revalidatePath("/workouts")
     redirect("/workouts")

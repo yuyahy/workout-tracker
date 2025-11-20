@@ -1,6 +1,8 @@
 import { Hono } from "hono"
 import { prisma } from "./prisma"
 import { auth } from "./auth"
+import { dynamodb } from "./dynamodb"
+import { QueryCommand } from "@aws-sdk/lib-dynamodb"
 
 // Honoの型定義
 type Variables = {
@@ -130,5 +132,24 @@ app.get("/api/stats/exercise/:name", async (c) => {
         progression,
     })
 })
+
+// DynamoDBから統計取得
+app.get("/api/stats/dynamodb", async (c) => {
+    const userId = c.get("userId") as string
+    const result = await dynamodb.send(
+        new QueryCommand({
+            TableName: "WorkoutStats",
+            KeyConditionExpression: "userId = :userId",
+            ExpressionAttributeValues: {
+                ":userId": userId,
+            },
+        })
+    )
+
+    return c.json({
+        stats: result.Items || {},
+    })
+})
+
 
 export default app
